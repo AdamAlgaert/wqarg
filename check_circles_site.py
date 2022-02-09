@@ -82,7 +82,7 @@ def detect_page_change():
                 res = page.goto("https://www.bungie.net/7/en/Direct/Circles")
                 assert res.status == 200, f'Got HTTP status {res.status}'
                 try:
-                    page.wait_for_selector('text="COMING SOONz" >> visible=true')
+                    page.wait_for_selector('text="COMING SOON" >> visible=true')
                     print('coming soon')
                     time.sleep(60)
                 except playwright.sync_api.TimeoutError:

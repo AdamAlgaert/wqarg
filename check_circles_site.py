@@ -3,7 +3,7 @@ import time
 import sys
 import requests
 from dotenv import load_dotenv
-from playwright.sync_api import sync_playwright, TimeoutError
+import playwright.sync_api
 
 load_dotenv()
 
@@ -74,22 +74,28 @@ def send_page_notifications(screenshot: bytes):
 
 
 def detect_page_change():
-    while True:
-        with sync_playwright() as p:
-            browser = p.chromium.launch()
-            page = browser.new_page()
-            page.goto("https://www.bungie.net/7/en/Direct/Circles")
+    with playwright.sync_api.sync_playwright() as p:
+        browser = p.chromium.launch()
+        while True:
             try:
-                page.wait_for_selector('text="COMING SOON" >> visible=true')
-                print('coming soon')
-
-            except TimeoutError:
-                print("it's go time")
-                screenshot = page.screenshot()
-                send_page_notifications(screenshot)
-                break
-            browser.close()
-        time.sleep(60)
+                page = browser.new_page()
+                res = page.goto("https://www.bungie.net/7/en/Direct/Circles")
+                assert res.status == 200, f'Got HTTP status {res.status}'
+                try:
+                    page.wait_for_selector('text="COMING SOONz" >> visible=true')
+                    print('coming soon')
+                    time.sleep(60)
+                except playwright.sync_api.TimeoutError:
+                    print("it's go time")
+                    screenshot = page.screenshot()
+                    send_page_notifications(screenshot)
+                    break
+            except (playwright.sync_api.Error, AssertionError) as e:
+                print(f'Failed to load ARG page: {str(e)}')
+                time.sleep(60)
+            finally:
+                page.close()
+        browser.close()
 
 
 def main():

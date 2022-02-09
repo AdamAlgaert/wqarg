@@ -58,8 +58,7 @@ def send_page_notifications(screenshot: bytes):
             webhook_token = webhook_url.split('/')[-1]
             webhook = discord.Webhook.partial(webhook_id, webhook_token, adapter=discord.RequestsWebhookAdapter())
             webhook.send(
-                # content='New circles page content.',
-                username='Darbi 55-30',
+                username='AI-COM//WQARG',
                 file=discord.File(io.BytesIO(screenshot), filename='screenshot.png'),
                 embed=discord.Embed.from_dict({
                     'image': {'url': 'attachment://screenshot.png'},

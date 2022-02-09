@@ -81,10 +81,10 @@ def detect_page_change():
                 page = browser.new_page()
                 res = page.goto("https://www.bungie.net/7/en/Direct/Circles")
                 assert res.status == 200, f'Got HTTP status {res.status}'
+                page.wait_for_selector('#main-navigation')
                 try:
-                    page.wait_for_selector('text="COMING SOON" >> visible=true')
+                    page.wait_for_selector('text="COMING SOON" >> visible=true', timeout=5000)
                     print('coming soon')
-                    time.sleep(60)
                 except playwright.sync_api.TimeoutError:
                     print("it's go time")
                     screenshot = page.screenshot()
@@ -92,9 +92,9 @@ def detect_page_change():
                     break
             except (playwright.sync_api.Error, AssertionError) as e:
                 print(f'Failed to load ARG page: {str(e)}')
-                time.sleep(60)
             finally:
                 page.close()
+            time.sleep(60)
         browser.close()
 
 

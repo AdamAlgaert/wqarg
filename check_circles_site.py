@@ -1,9 +1,11 @@
+import io
 import os
 import time
 import sys
 import requests
 from dotenv import load_dotenv
 import playwright.sync_api
+import discord
 
 load_dotenv()
 
@@ -52,9 +54,17 @@ def send_page_notifications(screenshot: bytes):
     if os.getenv('DISCORD_WEBHOOK'):
         urls = os.getenv('DISCORD_WEBHOOK').split(';')
         for webhook_url in urls:
-            requests.post(
-                webhook_url,
-                json={'content': f'@everyone new circles page content.'},
+            webhook_id = int(webhook_url.split('/')[-2])
+            webhook_token = webhook_url.split('/')[-1]
+            webhook = discord.Webhook.partial(webhook_id, webhook_token, adapter=discord.RequestsWebhookAdapter())
+            webhook.send(
+                # content='New circles page content.',
+                username='Darbi 55-30',
+                file=discord.File(io.BytesIO(screenshot), filename='screenshot.png'),
+                embed=discord.Embed.from_dict({
+                    'image': {'url': 'attachment://screenshot.png'},
+                    'description': 'New page content.\nhttps://bungie.net/circles',
+                })
             )
 
     # send a push notification to my phone

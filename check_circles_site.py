@@ -50,6 +50,21 @@ def detect_url_change():
 
 
 def send_page_notifications(screenshot: bytes):
+    # send a push notification to my phone
+    if os.getenv('PUSHOVER_TOKEN') and os.getenv('PUSHOVER_USER'):
+        requests.post(
+            'https://api.pushover.net/1/messages.json',
+            data={
+                'token': os.getenv('PUSHOVER_TOKEN'),
+                'user': os.getenv('PUSHOVER_USER'),
+                'message': f'Circles page changed.',
+                # 'sound': 'Savathuns_Song',
+            },
+            files={
+                'attachment': ('screenshot.png', screenshot, 'image/png')
+            }
+        )
+
     # post to a discord channel
     if os.getenv('DISCORD_WEBHOOK'):
         urls = os.getenv('DISCORD_WEBHOOK').split(';')
@@ -65,21 +80,6 @@ def send_page_notifications(screenshot: bytes):
                     'description': 'New page content.\nhttps://bungie.net/circles',
                 })
             )
-
-    # send a push notification to my phone
-    if os.getenv('PUSHOVER_TOKEN') and os.getenv('PUSHOVER_USER'):
-        requests.post(
-            'https://api.pushover.net/1/messages.json',
-            data={
-                'token': os.getenv('PUSHOVER_TOKEN'),
-                'user': os.getenv('PUSHOVER_USER'),
-                'message': f'Circles page changed.',
-                # 'sound': 'Savathuns_Song',
-            },
-            files={
-                'attachment': ('screenshot.png', screenshot, 'image/png')
-            }
-        )
 
 
 def detect_page_change():

@@ -2,6 +2,10 @@ import os
 import requests
 from dotenv import load_dotenv
 from functools import cache
+import pathlib
+
+load_dotenv()
+
 
 @cache
 def get_mapping_data():

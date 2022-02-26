@@ -14,35 +14,45 @@ from functools import cache
 def rgb_to_hex(rgb):
     return '#%02x%02x%02x' % rgb[0:3]
 
-def process_palette():
-    tj_pal = requests.get('https://tjl.co/wqarg/palettes.json').json()
-    final_pal = {}
-    out_map = {}
-    for i, pal in enumerate(tj_pal):
-        final_pal[i] = set(pal)
-        other_pals = tj_pal[:i] + tj_pal[i+1:]
-        for pal2 in other_pals:
-            final_pal[i] -= set(pal2)
-    for i, colors in final_pal.items():
-        for c in colors:
-            out_map[c]=i
-    return out_map
+def single_true(iterable):
+    i = iter(iterable)
+    return any(i) and not any(i)
+
+def generate_palette():
+    all_slices = set(['img_slices/' + x for x in os.listdir('img_slices')])
+    all_palettes = set()
+    for f in all_slices.copy():
+        img = Image.open(f)
+        slice_palette = frozenset([x[1] for x in img.getcolors()])
+        if len(slice_palette)==16:
+            all_palettes.add(slice_palette)
+            all_slices.remove(f)
+    print(len(all_palettes), len(all_slices))
+
+    for f in all_slices.copy():
+        img = Image.open(f)
+        slice_palette = frozenset([x[1] for x in img.getcolors()])
+        if single_true([slice_palette.issubset(x) for x in all_palettes]):
+            all_slices.remove(f)
+    print(f"Palettes: {len(all_palettes)}, Ambiguous slices: {len(all_slices)}")
+    out_palette = {p: i for i, p in enumerate(all_palettes, start=1)}
+    return out_palette
+
 
 def get_pages():
-    pal_map = process_palette()
+    # pal_map = process_palette()
+    my_pal = generate_palette()
     all_slices = set(['img_slices/' + x for x in os.listdir('img_slices')])
     pages = {}
     for f in all_slices.copy():
-        print(f)
+        # print(f)
         img = Image.open(f)
-        arr = img.__array__()
-        for pixel_arr in arr[::10, ::10]:
-            rgb_hex = rgb_to_hex(tuple(pixel_arr[0]))
-            page_num = pal_map.get(rgb_hex)
-            if page_num:
-                pages.setdefault(page_num, set()).add(f)
-                all_slices.remove(f)
-                break
+        # arr = img.__array__()
+        slice_palette = frozenset([x[1] for x in img.getcolors()])
+        page = [y for x, y in my_pal.items() if slice_palette.issubset(x)]
+        if len(page) == 1:
+            pages.setdefault(page[0], set()).add(f)
+            all_slices.remove(f)
     return pages, all_slices
 
 

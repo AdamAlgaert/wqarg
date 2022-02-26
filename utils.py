@@ -12,7 +12,7 @@ def get_mapping_data():
     return requests.get('https://tjl.co/wqarg/mapping.json').json()
 
 
-def post_strip_data(data):
+def post_strip_data(data, name=''):
     mapping = get_mapping_data()
     strip_names_3 = {}
     for i, f in enumerate(data):
@@ -27,4 +27,4 @@ def post_strip_data(data):
     data = response.json()
     if 'error' in data:
         raise Exception('Error from save API: ' + data.error)
-    print(f"- {data['url']}")
+    print(f"{name}- {data['url']}")

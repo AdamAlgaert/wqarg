@@ -2,7 +2,7 @@ import sys
 import os
 from PIL import Image
 import numpy as np
-from utils import post_strip_data
+from utils import post_strip_data, STABLE_PALETTE
 from itertools import chain
 import requests
 from functools import cache
@@ -41,7 +41,8 @@ def generate_palette():
 
 def get_pages():
     # pal_map = process_palette()
-    my_pal = generate_palette()
+    # my_pal = generate_palette()
+    my_pal = STABLE_PALETTE
     all_slices = set(['img_slices/' + x for x in os.listdir('img_slices')])
     pages = {}
     for f in all_slices.copy():

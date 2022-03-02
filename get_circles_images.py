@@ -46,7 +46,11 @@ def main():
     os.makedirs('imgs', exist_ok=True)
     sheet_json = requests.get(SPREADSHEET_URL).json()
     url_re = re.compile('^https://www.bungie.net/pubassets/wqarg/strips/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}.png')
-    image_urls = [x['Paste your Image link here'] for x in sheet_json if url_re.match(x['Paste your Image link here'])]
+    try:
+        image_urls = [x['Paste your Image link here'] for x in sheet_json if url_re.match(x['Paste your Image link here'])]
+    except:
+        print(sheet_json)
+        raise
     for url in image_urls:
         download_file(url)
 

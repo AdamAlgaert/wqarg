@@ -2,10 +2,12 @@ import sys
 import os
 from PIL import Image
 import numpy as np
-from utils import post_strip_data, STABLE_PALETTE
+from utils import post_strip_data, STABLE_PALETTE, create_image
 from itertools import chain
 import requests
 from functools import cache
+
+import page_sort
 
 #  '//input received/"Reroute IKO-006-XX750210p"'
 
@@ -57,12 +59,43 @@ def get_pages():
     return pages, all_slices
 
 
+def sort_pages(pages):
+    for p in pages:
+        if hasattr(page_sort, 'sort_pg_'+str(p)):
+            pages[p] = getattr(page_sort, 'sort_pg_'+str(p))(pages[p])
+        else:
+            pages[p] = page_sort.sort_pg_numbers(pages[p])
+    return pages
+
+
 def main():
     pages, leftovers = get_pages()
-    post_strip_data(chain(*pages.values()), name='full')
-    post_strip_data(leftovers, name='leftovers')
-    for pn, z in pages.items():
-        post_strip_data(z, name=pn)
+    pages = sort_pages(pages)
+
+    # create_image(pages[12], 'output/pg12.png')
+
+
+    # post_strip_data(chain(*[pages[x] for x in sorted(pages)]), name='full')
+    # #
+    # post_strip_data(leftovers, name='leftovers')
+    # for pn in sorted(pages.keys()):
+    #     post_strip_data(pages[pn], name=pn)
+
+    # post_strip_data(pages[1], name='1')
+    # post_strip_data(pages[8], name='8')
+    post_strip_data(pages[12], name='12')
+    # post_strip_data(pages[20], name='20')
+    # post_strip_data(pages[21], name='21')
+    # post_strip_data(pages[23], name='23')
+    # post_strip_data(pages[29], name='29')
+    post_strip_data(pages[26], name='26')
+    post_strip_data(pages[27], name='27')
+    post_strip_data(pages[28], name='28')
+    post_strip_data(pages[29], name='29')
+    post_strip_data(pages[30], name='30')
+
+    create_image(chain(*[pages[x] for x in [26, 27, 28, 29, 30]]), 'output/purple_pages.png')
+    # create_image(chain(*[pages[x] for x in sorted(pages)]), 'output/full.png')
     print('done')
 
 

@@ -83,7 +83,7 @@ def main():
 
     # post_strip_data(pages[1], name='1')
     # post_strip_data(pages[8], name='8')
-    post_strip_data(pages[12], name='12')
+    # post_strip_data(pages[12], name='12')
     # post_strip_data(pages[20], name='20')
     # post_strip_data(pages[21], name='21')
     # post_strip_data(pages[23], name='23')
@@ -94,6 +94,7 @@ def main():
     post_strip_data(pages[29], name='29')
     post_strip_data(pages[30], name='30')
 
+    post_strip_data(chain(*[pages[x] for x in [26, 27, 28, 29, 30]]), name='full')
     create_image(chain(*[pages[x] for x in [26, 27, 28, 29, 30]]), 'output/purple_pages.png')
     # create_image(chain(*[pages[x] for x in sorted(pages)]), 'output/full.png')
     print('done')
